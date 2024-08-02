@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Class Attendance System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script>
+        function updateImage() {
+            const img = document.getElementById('recognition-result');
+            const timestamp = new Date().getTime(); // Prevent caching
+            img.src = '/get_latest_image?' + timestamp;
+        }
+
+        function updateOutput() {
+            fetch('/get_latest_output')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('output').innerText = data.output;
+                });
+        }
+
+        function updateContent() {
+            updateImage();
+            updateOutput();
+        }
+
+        setInterval(updateContent, 200); // Update every 1 second
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Class Attendance System</h1>
+        <form action="{{ url_for('enroll') }}" method="post">
+            <button type="submit" class="button">Enroll</button>
+        </form>
+        <form action="{{ url_for('verify') }}" method="post" class="form-verify">
+            <label for="method">Live Detection Method:</label>
+            <select name="method" id="method">
+                <option value="blink">Blink</option>
+                <option value="mouth-open">Mouth Open</option>
+                <option value="cnn">CNN</option>
+                <option value="albu">Albu</option>
+            </select>
+            <button type="submit" class="button">Verify</button>
+        </form>
+        <div class="output-section">
+            <h2>Output:</h2>
+            <div id="output"></div>
+            <div id="image-output">
+                <img id="recognition-result" src="{{ url_for('static', filename='tmp/tmp_image.jpg') }}" alt="Recognition Result" class="output-image">
+            </div>
+        </div>
+    </div>
+</body>
+</html>
